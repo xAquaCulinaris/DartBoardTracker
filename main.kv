@@ -1,0 +1,78 @@
+Screen:
+    MDNavigationLayout:
+        ScreenManager:
+            Screen:
+                BoxLayout:
+                    orientation: 'vertical'
+                    MDToolbar:
+                        title: 'Dartboard'
+                        left_action_items: [["menu", lambda x: nav_drawer.set_state()]]
+                        right_action_items: [["menu", lambda y: nav_drawer.set_state()]]
+                        elevation:10
+
+                    Image: 
+                        source: 'dart_board.png'
+
+                    ScrollView:
+                        do_scroll_x: False
+                        do_scroll_y: True
+                        
+                        GridLayout:
+                            id: player_grid
+                            cols: 6
+                            spacing: 70
+                        
+                    
+                    Widget:
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            BoxLayout:
+                orientation: 'vertical'
+
+                MDLabel:
+                    text: 'Settings'
+                    halign: "center"
+                    font_size: 32
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDLabel:
+                    text: 'Current Players'
+                    halign: "left"
+                    font_size: 16
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDGridLayout:
+                    id: current_players_grid
+                    rows: 10
+                    adaptive_height: True
+
+                MDTextField:
+                    id: add_player_text
+                    hint_text: "Player name"
+
+             
+
+                MDRectangleFlatButton:
+                    id: add_player_button
+                    text: "Add Player"
+                    pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                    on_press: app.add_player_pressed()
+
+                MDLabel:
+                    text: 'Available Players'
+                    bold: True
+                    halign: "left"
+                    font_size: 16
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDGridLayout:
+                    id: available_players_grid
+                    rows: 10
+                    adaptive_height: True
+            
+                
+                ScrollView:
