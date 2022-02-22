@@ -11,7 +11,10 @@ Screen:
                         elevation:10
 
                     Image: 
-                        source: 'dart_board.png'
+                        source: 'assets/images/dart_board.png'
+                        allow_stretch: True
+                        keep_ratio: True
+                        width: 500
 
                     ScrollView:
                         do_scroll_x: False
@@ -23,7 +26,17 @@ Screen:
                             spacing: 70
                         
                     
-                    Widget:
+                    MDRectangleFlatButton:
+                        id: generate_button
+                        text: "Generate"
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        on_press: app.generate_test_data_pressed()
+
+                    MDRectangleFlatButton:
+                        id: miss_button
+                        text: "Miss"
+                        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+                        on_press: app.generate_test_data_pressed()
 
         MDNavigationDrawer:
             id: nav_drawer

@@ -4,22 +4,28 @@ from kivy.core.window import Window
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDTextButton
 from kivymd.uix.boxlayout import BoxLayout
+import random
 
 import os.path
 
-from player_widget import PlayerWidget
+from gui.player_widget import PlayerWidget
 
 
 Window.size = (1000, 600)
 
 class DartboardGui(MDApp):
+
+
     #build inital screen
     def build(self):
-        self.screen = Builder.load_file('main.kv')        
+        self.screen = Builder.load_file('gui/main.kv')        
         self.player_names = []
         self.available_players_labes = []
         self.current_players = []
         self.load_player_names_from_file()
+
+        self.current_player_index = 0
+
         
         return self.screen
 
@@ -62,7 +68,7 @@ class DartboardGui(MDApp):
     #writes a new player name to a file to save it permanently
     def write_player_name_to_file(self, name):
         # open file
-        player_names_file = open('player_names.txt', 'a')
+        player_names_file = open('assets/data/player_names.txt', 'a')
         #write name
         player_names_file.write(name+"\n")
         #close file
@@ -72,9 +78,9 @@ class DartboardGui(MDApp):
   
     #loads permanent players from file
     def load_player_names_from_file(self):
-        if os.path.isfile('player_names.txt'):
+        if os.path.isfile('assets/data/player_names.txt'):
             #open file
-            player_names_file = open('player_names.txt', 'r')
+            player_names_file = open('assets/data/player_names.txt', 'r')
             #get all lines
             names = player_names_file.readlines()
             #loop over each line
@@ -98,7 +104,6 @@ class DartboardGui(MDApp):
         #add player to main screen
         self.add_player_to_main_screen(button.text)
 
-
     #on button press remove label from list of current players
     def remove_label_from_current(self, button):
         #remove player from current players
@@ -118,3 +123,16 @@ class DartboardGui(MDApp):
         self.current_players.append(player)
         self.screen.ids.player_grid.add_widget(player.main_layout)
 
+    def generate_test_data_pressed(self):
+        if len(self.current_players) > 0:
+            current_player = self.current_players[self.current_player_index]
+
+            test_point = self.dartboard.get_random_point()
+            score = self.dartboard.check_point(test_point)
+
+            tmp_counter = current_player.update_score(score)
+            if tmp_counter == 0:
+                if self.current_player_index == len(self.current_players)-1:
+                    self.current_player_index = 0
+                else:
+                    self.current_player_index += 1
