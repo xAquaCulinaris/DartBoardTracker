@@ -1,10 +1,8 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.core.window import Window
-from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDTextButton
-from kivymd.uix.boxlayout import BoxLayout
-import random
+import cv2
 
 import os.path
 
@@ -14,8 +12,6 @@ from gui.player_widget import PlayerWidget
 Window.size = (1000, 600)
 
 class DartboardGui(MDApp):
-
-
     #build inital screen
     def build(self):
         self.screen = Builder.load_file('gui/main.kv')        
@@ -127,6 +123,7 @@ class DartboardGui(MDApp):
         if len(self.current_players) > 0:
             current_player = self.current_players[self.current_player_index]
 
+            #generate random point 
             test_point = self.dartboard.get_random_point()
             score = self.dartboard.check_point(test_point)
 
@@ -134,5 +131,19 @@ class DartboardGui(MDApp):
             if tmp_counter == 0:
                 if self.current_player_index == len(self.current_players)-1:
                     self.current_player_index = 0
+                    self.current_players[self.current_player_index].clear_score()
                 else:
                     self.current_player_index += 1
+                    self.current_players[self.current_player_index].clear_score()
+                    
+
+            
+            
+            #draw point to the image
+            if tmp_counter == 1:
+                dartboard_img = self.dartboard.draw_point_on_board(test_point, True)
+            else:
+                dartboard_img = self.dartboard.draw_point_on_board(test_point, False)
+            cv2.imwrite("assets/images/dartboard_hit.png", dartboard_img)
+            self.screen.ids.dartboard_img.source = "assets/images/dartboard_hit.png"
+            self.screen.ids.dartboard_img.reload()

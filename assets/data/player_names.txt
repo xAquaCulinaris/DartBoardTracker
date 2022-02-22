@@ -1,3 +1,2 @@
-mariantest
-spieler 3
-test
+marian
+player1
