@@ -198,7 +198,7 @@ class Dartboard:
     def draw_point_on_board(self, point, reset):
         if reset:
             self.dartboard = self.darboard_orignal.copy()
-        dartboard = cv2.circle(self.dartboard, point, 3, (0, 255, 0), -1)
+        dartboard = cv2.circle(self.dartboard, point, 5, (0, 255, 0), -1)
         return dartboard
 
     # generate 3 random points in radius

@@ -2,10 +2,11 @@ from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.core.window import Window
 from kivymd.uix.button import MDTextButton
-import cv2
 
+import cv2
 import os.path
 
+from gamemode.X01 import X01
 from gui.player_widget import PlayerWidget
 
 
@@ -20,8 +21,8 @@ class DartboardGui(MDApp):
         self.current_players = []
         self.load_player_names_from_file()
 
-        self.current_player_index = 0
 
+        self.gamemode = X01()
         
         return self.screen
 
@@ -115,35 +116,34 @@ class DartboardGui(MDApp):
         self.current_players.remove(player)
         
     def add_player_to_main_screen(self, name):
-        player = PlayerWidget(name)
+        player = PlayerWidget(name, "501")
         self.current_players.append(player)
         self.screen.ids.player_grid.add_widget(player.main_layout)
+        self.gamemode.add_player(name)
 
     def generate_test_data_pressed(self):
         if len(self.current_players) > 0:
-            current_player = self.current_players[self.current_player_index]
-
             #generate random point 
             test_point = self.dartboard.get_random_point()
             score = self.dartboard.check_point(test_point)
 
-            tmp_counter = current_player.update_score(score)
-            if tmp_counter == 0:
-                if self.current_player_index == len(self.current_players)-1:
-                    self.current_player_index = 0
-                    self.current_players[self.current_player_index].clear_score()
-                else:
-                    self.current_player_index += 1
-                    self.current_players[self.current_player_index].clear_score()
-                    
+            current_player, next_player_name = self.gamemode.score_hit(score)
+            current_player_widget = self.get_player_widget_by_name(current_player.name)
+            next_player_widget = self.get_player_widget_by_name(next_player_name)
+            current_player_widget.update_score(current_player)
+            if len(current_player.last_three_points) == 3:
+                next_player_widget.clear_score()
 
-            
-            
             #draw point to the image
-            if tmp_counter == 1:
+            if len(current_player.last_three_points) == 1:
                 dartboard_img = self.dartboard.draw_point_on_board(test_point, True)
             else:
                 dartboard_img = self.dartboard.draw_point_on_board(test_point, False)
             cv2.imwrite("assets/images/dartboard_hit.png", dartboard_img)
             self.screen.ids.dartboard_img.source = "assets/images/dartboard_hit.png"
             self.screen.ids.dartboard_img.reload()
+
+    def get_player_widget_by_name(self, name):
+        for player in self.current_players:
+            if player.name == name:
+                return player
