@@ -6,10 +6,11 @@ class Player():
         self.current_score = 0
         self.total_darts_thrown = 0
         self.last_three_points = []
+        self.current_darts_thrown = 0
 
 
     def get_avrg(self):
-        return round(self.total_score/self.total_darts_thrown, 2)
+        return round(self.total_score/self.total_darts_thrown*3, 2)
 
     def get_current_index(self):
         return len(self.last_three_points)-1
