@@ -15,7 +15,6 @@ class X01():
         self.current_player_index = 0
 
     # add new player
-
     def add_player(self, name):
         player = Player(name, self.game_score)
         self.players.append(player)
@@ -84,6 +83,7 @@ class X01():
         else:
             self.current_player_index += 1
 
+    # get the name of the next player
     def get_next_player_name(self):
         if self.current_player_index == len(self.players)-1:
             return self.players[0].name
@@ -91,13 +91,13 @@ class X01():
             return self.players[self.current_player_index+1].name
 
     # remove existing player
-
     def remove_player(self, name):
         for player in self.players:
             if player.name == name:
                 self.players.remove(player)
                 return
 
+    # convert score as string to int
     def string_to_score(self, score):
         s0 = score[0]
         if s0 == '-':
@@ -108,6 +108,7 @@ class X01():
             return 3*int(score[1:])
         return int(score)
 
+    # shows winner screen and resets game
     def player_won(self, player):
         layout = BoxLayout(orientation="vertical")
         label = MDLabel(text=player.name + " has won the game")
@@ -120,3 +121,9 @@ class X01():
 
         button.bind(on_press=popup.dismiss)
         popup.open()
+
+    def has_game_started(self):
+        if len(self.players) > 0:
+            if self.players[0].current_darts_thrown == 0:
+                return False
+            return True

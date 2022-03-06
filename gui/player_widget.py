@@ -43,7 +43,6 @@ class PlayerWidget:
         self.current_score_label.padding_x = 10
 
 
-
         # avg label
         self.avrg_icon = MDIcon(icon="assets/images/avrg_icon.png")
         self.avrg_icon.size_hint = (0.3, 0.6)

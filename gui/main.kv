@@ -114,7 +114,7 @@ Screen:
                     id: restart_game_button
                     text: "Restart game"
                     pos_hint: {"center_x": 0.5, "center_y": 0.5}
-                    on_press: app.restart_game()
+                    on_press: app.restart_game_popup("Are you sure you want to restart the game?")
             
                 
                 ScrollView:

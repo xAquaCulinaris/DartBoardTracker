@@ -3,6 +3,11 @@ from kivy.lang import Builder
 from kivy.core.window import Window
 from kivymd.uix.button import MDTextButton
 from kivymd.uix.menu import MDDropdownMenu
+from kivy.uix.popup import Popup
+from kivymd.uix.label import MDLabel
+from kivy.uix.button import Button
+from kivymd.uix.boxlayout import BoxLayout
+
 import random
 import cv2
 import os.path
@@ -124,19 +129,24 @@ class DartboardGui(MDApp):
 
     # on button press remove label from list of current players
     def remove_label_from_current(self, button):
-        # remove player from current players
-        self.screen.ids.current_players_grid.remove_widget(button)
-        # rebind button press
-        button.unbind(on_press=self.remove_label_from_current)
-        button.bind(on_press=self.remove_label_from_avilable)
-        # add player to avaible palyers
-        self.screen.ids.available_players_grid.add_widget(button)
-        # remove player from main screen
-        player = self.get_player_from_list(button.text, self.current_players)
-        self.screen.ids.player_grid.remove_widget(player.main_layout)
-        self.current_players.remove(player)
-        # remove player from gamemode
-        self.gamemode.remove_player(player.name)
+        if not self.gamemode.has_game_started():
+            # remove player from current players
+            self.screen.ids.current_players_grid.remove_widget(button)
+            # rebind button press
+            button.unbind(on_press=self.remove_label_from_current)
+            button.bind(on_press=self.remove_label_from_avilable)
+            # add player to avaible palyers
+            self.screen.ids.available_players_grid.add_widget(button)
+            # remove player from main screen
+            player = self.get_player_from_list(
+                button.text, self.current_players)
+            self.screen.ids.player_grid.remove_widget(player.main_layout)
+            self.current_players.remove(player)
+            # remove player from gamemode
+            self.gamemode.remove_player(player.name)
+        else:
+            self.warning_popup(
+                "Warning", "Player cant be removed mid game", "Okay")
 
     def add_player_to_main_screen(self, name):
         player = PlayerWidget(name, self.gamemode.game_score)
@@ -158,7 +168,7 @@ class DartboardGui(MDApp):
                 score)
 
             if game_over:
-                self.restart_game()
+                self.restart_game(None)
             else:
                 current_player_widget = self.get_player_widget_by_name(
                     current_player.name)
@@ -210,7 +220,7 @@ class DartboardGui(MDApp):
             if player.name == name:
                 return player
 
-    def restart_game(self):
+    def restart_game(self, obj):
         player_names = []
         for player in self.current_players:
             self.screen.ids.player_grid.remove_widget(player.main_layout)
@@ -229,9 +239,43 @@ class DartboardGui(MDApp):
             self.screen.ids.player_grid.add_widget(player.main_layout)
             self.gamemode.add_player(name)
 
+    # change gamemode from double to single out
     def on_double_out_switched(self, checkbox, value):
         self.gamemode.double_out = value
 
     def menu_callback(self, text_item):
         self.gamemode.game_score = int(text_item)
-        self.restart_game()
+        self.restart_game_popup(
+            "Changing the gamescore will restart the game.\nAre you sure?")
+
+    # display popup with one button
+    def warning_popup(self, title, text, button_text):
+        layout = BoxLayout(orientation="vertical")
+        label = MDLabel(text=text)
+        button = Button(text=button_text)
+        layout.add_widget(label)
+        layout.add_widget(button)
+        popup = Popup(title=title,
+                      content=layout,
+                      size_hint=(None, None), size=(400, 200))
+
+        button.bind(on_press=popup.dismiss)
+        popup.open()
+
+    def restart_game_popup(self, text):
+        layout = BoxLayout(orientation="vertical")
+        label = MDLabel(text=text)
+        label.color = (1, 1, 1, 1)
+        yes_button = Button(text="Yes")
+        no_button = Button(text="No")
+        layout.add_widget(label)
+        layout.add_widget(no_button)
+        layout.add_widget(yes_button)
+        popup = Popup(title="Warning",
+                      content=layout,
+                      size_hint=(None, None), size=(400, 200))
+
+        no_button.bind(on_press=popup.dismiss)
+        yes_button.bind(on_press=popup.dismiss)
+        yes_button.bind(on_press=self.restart_game)
+        popup.open()
